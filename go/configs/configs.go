@@ -12,15 +12,13 @@ func Get(configType int, nrows int, ncols int) []int{
 
 	var result []int
 
-	rows, cols := nrows+2, ncols+2
-
 	switch configType{
 		case CHECKERBOARD:
-			result = checkerboard(rows, cols)
+			result = checkerboard(nrows, ncols)
 		case INTERFACE:
-			result = interfaceboard(rows, cols)
+			result = interfaceboard(nrows, ncols)
 		case UNEQUAL:
-			result = unequalinterface(rows, cols)
+			result = unequalinterface(nrows, ncols)
 	}
 
 	return result

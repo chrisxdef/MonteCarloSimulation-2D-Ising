@@ -1,15 +1,18 @@
 package main
 
 import(
-	"github.com/Heisler0/MonteCarlo/go/configs"
-	"fmt"
+	"github.com/Heisler0/MonteCarloSimulation-2D-Ising/go/configs"
+	"github.com/Heisler0/MonteCarloSimulation-2D-Ising/go/mcs"
+	//"fmt"
 )
 
 func main(){
-	_ = configs.Get(configs.CHECKERBOARD, 20, 20)
-	inter := configs.Get(configs.INTERFACE, 20, 20)
-	for i := 0; i<len(inter); i++{
-		fmt.Print(inter[i])
-	}
-	_ = configs.Get(configs.UNEQUAL, 20, 20)
+
+	nrows, ncols := 20 + 2, 20 + 2
+
+	_ = configs.Get(configs.CHECKERBOARD, nrows, ncols)
+	inter := configs.Get(configs.INTERFACE, nrows, ncols)
+	_ = configs.Get(configs.UNEQUAL, nrows, ncols)
+
+	mcs.Simulate(inter, 22, 22, 1)
 }
