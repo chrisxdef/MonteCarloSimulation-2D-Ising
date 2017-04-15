@@ -82,10 +82,10 @@ func main(){
 						ech<-float64(sum)
 
 					}()
-					mag = <-mch
+					mag = (<-mch)/float64(nrows*ncols)
 					mag_avg += mag
 					mag2_avg += math.Pow(mag, 2)
-					eng = <-ech
+					eng = <-ech/float64(nrows*ncols*2)
 					energy_avg += eng
 					energy2_avg += math.Pow(eng, 2)
 				}
