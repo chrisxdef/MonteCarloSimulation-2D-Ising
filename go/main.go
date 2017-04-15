@@ -5,18 +5,49 @@ import(
 	"github.com/Heisler0/MonteCarloSimulation-2D-Ising/go/mcs"
 	"math"
 	"fmt"
+	"encoding/json"
+	"os"
+	"io/ioutil"
+	"runtime"
 )
+
+type IsingInput struct{
+	Nrows int
+	Ncols int
+	Config int
+	Npass int
+	Nequil int
+	High_temp float64
+	Low_temp float64
+	Temp_interval float64
+}
+
 
 func main(){
 
-	nrows, ncols := 20 + 2, 20 + 2
-	config := configs.INTERFACE
-	npass, nequil := 5000, 2500
-	high_temp, low_temp, temp_interval, temp := 400.0, 200.0, 5.0, 0.0
+	runtime.GOMAXPROCS(4)
+
+	filename := os.Args[1]
+	file, e := ioutil.ReadFile("../input/"+filename)
+	if e != nil {
+		fmt.Println("Read error: ", e)
+		os.Exit(1)
+	}
+
+	var input IsingInput
+	e = json.Unmarshal(file, &input)
+	if e != nil {
+		fmt.Println("Json error: ", e)
+	}
+
+	nrows, ncols := input.Nrows + 2, input.Ncols + 2
+	config := input.Config
+	npass, nequil := input.Npass, input.Nequil
+	high_temp, low_temp, temp_interval, temp := input.High_temp, input.Low_temp, input.Temp_interval, 0.0
 
 	nscans := (high_temp - low_temp)/temp_interval + 1.0
 
-	ch := make(chan float64, int(nscans)*8)
+	ch := make(chan float64, int(nscans)*7)
 
 	for iscan := 0.0; iscan < nscans; iscan++{
 		temp = high_temp - temp_interval*iscan
@@ -60,18 +91,27 @@ func main(){
 				}
 				mcs.Simulate(A, nrows, ncols, beta)
 			}
+
 			ch<-temp
+
 			ch<-math.Abs(mag_avg/counter)
 			ch<-mag2_avg/counter
 			ch<-beta*(mag2_avg/counter - math.Pow(mag_avg, 2))
-			ch<-temp
 			ch<-energy_avg/counter
 			ch<-energy2_avg/counter
 			ch<-beta*(energy2_avg/counter - math.Pow(energy_avg, 2))
 		}(temp)
 	}
+	output, e := os.Create("../output/results-"+filename[0:len(filename)-5]+"-go.csv")
+	if e != nil{
+		fmt.Println("Cannot create file: ", e)
+	}
+	defer output.Close()
+
+	fmt.Fprintf(output, "temperature,ave_magnetization,ave_magnetization^2,susceptibility,ave_energy,ave_energy^2,C_v\n")
 	for i:=0.0; i<nscans; i++{
-		fmt.Println(<-ch,<-ch,<-ch,<-ch)
-		fmt.Println(<-ch,<-ch,<-ch,<-ch)
+		//fmt.Fprintf(<-ch+","+<-ch+","+<-ch+","+<-ch+","+<-ch+","+<-ch+","<-ch)
+		fmt.Fprintf(output, "%f,%f,%f,%f,%f,%f,%f\n",<-ch,<-ch,<-ch,<-ch,<-ch,<-ch,<-ch)
+
 	}
 }

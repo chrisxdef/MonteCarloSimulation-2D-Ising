@@ -1,0 +1,10 @@
+{
+	"nrows" : 20,
+	"ncols" : 20,
+	"config" : 2,
+	"npass" : 5000,
+	"nequil" : 2500,
+	"high_temp" : 500.0,
+	"low_temp" : 100.0,
+	"temp_interval" : 5.0
+}
