@@ -111,7 +111,7 @@ func main(){
 	fmt.Fprintf(output, "temperature,ave_magnetization,ave_magnetization^2,susceptibility,ave_energy,ave_energy^2,C_v\n")
 	for i:=0.0; i<nscans; i++{
 		//fmt.Fprintf(<-ch+","+<-ch+","+<-ch+","+<-ch+","+<-ch+","+<-ch+","<-ch)
-		fmt.Fprintf(output, "%f,%f,%f,%f,%f,%f,%f\n",<-ch,<-ch,<-ch,<-ch,<-ch,<-ch,<-ch)
+		fmt.Fprintf(output, "%d,%f,%f,%f,%f,%f,%f\n",int(<-ch),<-ch,<-ch,<-ch,<-ch,<-ch,<-ch)
 
 	}
 }
