@@ -3,6 +3,7 @@
 
 import math
 import random
+import json
 
 # Function prints array, for testing
 def print_array():
@@ -11,27 +12,36 @@ def print_array():
             print(str(spinArray[i][j]), end=" ")
         print()
 
+# Read from input file
+inputFile = open("input.json")
+parsedJSON = json.loads(inputFile.read())
+
 # Define parameters
 # For this version of the program, many things will be hard coded
 # Future versions may use File I/O
-size = 20 # size of the square 2-D Ising Model
-nSamples = 5000 # number of random samples
-nEquil = 2500 # passes until equilibrium is "reached"
-highTemp = 500 # Upper limit of temperatures to scan over
-lowTemp = 100 # Lower limit of temperatures to scan over
-tempInt = 5 # Interval of scans
+size = parsedJSON['nrows'] # size of the square 2-D Ising Model
+nSamples = parsedJSON['npass'] # number of random samples
+nEquil = parsedJSON['nequil'] # passes until equilibrium is "reached"
+highTemp = parsedJSON['high_temp'] # Upper limit of temperatures to scan over
+lowTemp = parsedJSON['low_temp'] # Lower limit of temperatures to scan over
+tempInt = parsedJSON['temp_interval'] # Interval of scans
 
 nScans = int((highTemp - lowTemp) / tempInt)
 
 # Create output files and write function
-magFile = open("magnetization.txt", "w")
-magFile.write("Temp\t\tAve_magnetization\tAve_magnetization^2\n")
-energyFile = open("energy.txt", "w")
-energyFile.write("Temp\t\tAve_energy\tAve_energy^2\n")
+magFile = open("magnetization.csv", "w")
+magFile.write("Temp,Ave_magnetization,Ave_magnetization^2\n")
+energyFile = open("energy.csv", "w")
+energyFile.write("Temp,Ave_energy,Ave_energy^2\n")
+bothFile = open ("both.csv", "w")
+bothFile.write("temperature,ave_magnetization,ave_magnetization^2,ave_energy,ave_energy^2\n")
 
 def write_vals(temp, magAvg, magAvgSq, energyAvg, energyAvgSq):
-    magFile.write(str(round(temp, 4)) + "\t\t" + str(round(magAvg, 4)) + "\t\t\t" + str(round(magAvgSq, 4)) + "\n")
-    energyFile.write(str(round(temp, 4)) + "\t\t" + str(round(energyAvg, 4)) + "\t\t" + str(round(energyAvgSq, 4)) + "\n")
+    magFile.write(str(round(temp, 4)) + "," + str(round(magAvg, 4)) + "," + str(round(magAvgSq, 4)) + "\n")
+    energyFile.write(str(round(temp, 4)) + "," + str(round(energyAvg, 4)) + "," + str(round(energyAvgSq, 4)) + "\n")
+    bothFile.write(str(round(temp, 4)) + "," + str(round(magAvg, 4)) + "," + str(round(magAvgSq, 4)) + ","
+                   + str(round(energyAvg, 4)) + "," + str(round(energyAvgSq, 4)) + "\n")
+
 
 # Begin scan loop
 for iScan in range(nScans):
