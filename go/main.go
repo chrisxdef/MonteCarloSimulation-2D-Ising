@@ -28,7 +28,7 @@ func main(){
 	runtime.GOMAXPROCS(4)
 
 	filename := os.Args[1]
-	file, e := ioutil.ReadFile("../input/"+filename)
+	file, e := ioutil.ReadFile(filename)
 	if e != nil {
 		fmt.Println("Read error: ", e)
 		os.Exit(1)
@@ -51,7 +51,6 @@ func main(){
 
 	for iscan := 0.0; iscan < nscans; iscan++{
 		temp = high_temp - temp_interval*iscan
-
 		go func(temp float64){
 			beta := 1.0/temp
 			counter := 0.0
@@ -96,13 +95,13 @@ func main(){
 
 			ch<-math.Abs(mag_avg/counter)
 			ch<-mag2_avg/counter
-			ch<-beta*(mag2_avg/counter - math.Pow(mag_avg, 2))
+			ch<-beta*(mag2_avg/counter - math.Pow(mag_avg/counter, 2))
 			ch<-energy_avg/counter
 			ch<-energy2_avg/counter
-			ch<-beta*(energy2_avg/counter - math.Pow(energy_avg, 2))
+			ch<-math.Pow(beta, 2)*(energy2_avg/counter - math.Pow(energy_avg/counter, 2))
 		}(temp)
 	}
-	output, e := os.Create("../output/results-"+filename[0:len(filename)-5]+"-go.csv")
+	output, e := os.Create("../output/results-"+filename[9:len(filename)-5]+"-go.csv")
 	if e != nil{
 		fmt.Println("Cannot create file: ", e)
 	}
@@ -110,8 +109,7 @@ func main(){
 
 	fmt.Fprintf(output, "temperature,ave_magnetization,ave_magnetization^2,susceptibility,ave_energy,ave_energy^2,C_v\n")
 	for i:=0.0; i<nscans; i++{
-		//fmt.Fprintf(<-ch+","+<-ch+","+<-ch+","+<-ch+","+<-ch+","+<-ch+","<-ch)
-		fmt.Fprintf(output, "%d,%f,%f,%f,%f,%f,%f\n",int(<-ch),<-ch,<-ch,<-ch,<-ch,<-ch,<-ch)
+		fmt.Fprintf(output, "%f,%f,%f,%f,%f,%f,%f\n",<-ch,<-ch,<-ch,<-ch,<-ch,<-ch,<-ch)
 
 	}
 }

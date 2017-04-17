@@ -46,28 +46,19 @@ func checkerboard(rows int, cols int) []int{
 
 func interfaceboard(rows int, cols int) []int{
 	result := make([]int, rows*cols)
-	ch := make(chan int, rows)
+	half := cols/2
 	for i := 0; i<rows; i++{
-		go func(row int){
-			for j := 0; j<cols/2; j++{
-				result[row*rows+j] = 1
-			}
-			ch<-1
-		}(i)
-		go func(row int){
-			for j := cols/2; j<cols; j++{
-				result[row*rows+j] = -1
-			}
-			ch<-1
-		}(i)
+		for j := 0; j<half; j++{
+			result[i*rows+j] = 1
+			result[i*rows+j+half] = -1
+		}
 	}
-	<-ch
 	return result
 }
 
 func unequalinterface(rows int, cols int) []int{
 	result := make([]int, rows*cols)
-	ch := make(chan int, rows)
+	ch := make(chan int, rows*cols)
 	for i := 0; i<rows; i++{
 		go func(row int){
 			for j := 0; j<cols/2; j++{
